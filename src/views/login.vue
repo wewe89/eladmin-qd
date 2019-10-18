@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" label-position="left" label-width="0px" class="login-form">
-      <h3 class="title">EL-ADMIN 后台管理系统</h3>
+      <h3 class="title">巴中农商银行综合管理系统</h3>
       <el-form-item prop="username">
         <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon"/>
@@ -50,7 +50,7 @@ export default {
       cookiePass: '',
       loginForm: {
         username: 'admin',
-        password: '123456',
+        password: '',
         rememberMe: false,
         code: '',
         uuid: ''
