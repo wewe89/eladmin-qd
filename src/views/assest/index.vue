@@ -35,10 +35,10 @@
     <el-table v-loading="loading" :data="data" size="small" style="width: 100%;">
       <el-table-column prop="id" label="序号"/>
       <el-table-column prop="idPc.name" label="一级类别"/>
-      <el-table-column prop="idSc" label="二级类别"/>
+      <el-table-column prop="idSc.name" label="二级类别"/>
       <el-table-column prop="idAn" label="资产名称"/>
-      <el-table-column prop="idDept" label="所属部门"/>
-      <el-table-column prop="idUser" label="责任者"/>
+      <el-table-column prop="idDept.name" label="所属部门"/>
+      <el-table-column prop="idUser.username" label="责任者"/>
       <el-table-column prop="status" label="状态"/>
       <el-table-column v-if="checkPermission(['admin','myAssetList:edit','myAssetList:del'])" label="操作" width="150px" align="center">
         <template slot-scope="scope">
@@ -80,7 +80,6 @@ export default {
   data() {
     return {
       delLoading: false,
-      id_pc:'',
       queryTypeOptions: [
         { key: 'idAn', display_name: '资产名称' }
       ]
@@ -122,13 +121,28 @@ export default {
       })
     },
     add() {
+      const _this = this.$refs.form
+
+      _this.getPrimaryCategory()
+      _this.getSecondaryCategory()
+      _this.getDepts()
+
       this.isAdd = true
       this.$refs.form.dialog = true
     },
     edit(data) {
       this.isAdd = false
-      this.id_pc=data.idPc.id
       const _this = this.$refs.form
+      _this.pcid=data.idPc.id
+      
+      _this.scid=data.idSc.id
+      _this.deptId = data.idDept.id
+
+      _this.getPrimaryCategory()
+      _this.getSecondaryCategory()
+      _this.getDepts()
+
+      // console.log(_this.primaryCategorys)
       _this.form = {
         id: data.id,
         // idPc: {id:data.idPc.id,name:data.idPc.name},

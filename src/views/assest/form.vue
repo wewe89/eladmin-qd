@@ -2,16 +2,29 @@
   <el-dialog :append-to-body="true" :close-on-click-modal="false" :before-close="cancel" :visible.sync="dialog" :title="isAdd ? '新增' : '编辑'" width="500px">
     <el-form ref="form" :model="form" :rules="rules" size="small" label-width="80px">
       <el-form-item label="一级类别" >
-        <el-input v-model="form.idPc.name" style="width: 370px;"/>
+        <!-- <el-input v-model="form.idPc.name" style="width: 370px;"/> -->
+        <el-select v-model="pcid" style="width: 370px" placeholder="请选择一级类别">
+          <el-option
+            v-for="(item, index) in primaryCategorys"
+            :key="item.name + index"
+            :label="item.name"
+            :value="item.id"/>
+        </el-select>
       </el-form-item>
       <el-form-item label="二级类别" >
-        <el-input v-model="form.idSc" style="width: 370px;"/>
+        <el-select v-model="scid" style="width: 370px" placeholder="请选择二级类别">
+          <el-option
+            v-for="(item, index) in secondaryCategorys"
+            :key="item.name + index"
+            :label="item.name"
+            :value="item.id"/>
+        </el-select>
       </el-form-item>
       <el-form-item label="资产名称" >
         <el-input v-model="form.idAn" style="width: 370px;"/>
       </el-form-item>
       <el-form-item label="所属部门" >
-        <el-input v-model="form.idDept" style="width: 370px;"/>
+        <treeselect v-model="deptId" :options="depts" style="width: 370px" placeholder="选择部门" @select="selectFun" :isDefaultExpanded="true"/>
       </el-form-item>
       <el-form-item label="责任者" >
         <el-input v-model="form.idUser" style="width: 370px;"/>
@@ -29,7 +42,13 @@
 
 <script>
 import { add, edit } from '@/api/myAssetList'
+import { getDepts } from '@/api/dept'
+import { getAllPrimaryCategory } from '@/api/myPrimaryCategory'
+import { getAllSecondaryCategory } from '@/api/mySecondaryCategory'
+import Treeselect from '@riophae/vue-treeselect'
+import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 export default {
+  components: { Treeselect },
   props: {
     isAdd: {
       type: Boolean,
@@ -39,14 +58,15 @@ export default {
   data() {
     return {
       loading: false, dialog: false,
-      id_pc: '',
+      pcid: '',scid: '',deptId: null,
+      primaryCategorys:[ ],secondaryCategorys:[ ], depts:[ ],
       form: {
         id: '',
         idPc: { id: '' },
-        idSc: '',
+        idSc: { id: '' },
         idAn: '',
-        idDept: '',
-        idUser: '',
+        idDept: { id: '' },
+        idUser: { id: '',name: '' },
         status: ''
       },
       rules: {
@@ -59,7 +79,9 @@ export default {
     },
     doSubmit() {
       
-      // this.form.idPc.id = this.id_pc
+      this.form.idPc.id = this.pcid
+      this.form.idSc.id = this.scid
+      this.form.idDept.id = this.deptId
 
       // console.log(this.id_pc)
 
@@ -100,18 +122,44 @@ export default {
     },
     resetForm() {
       this.dialog = false
-      this.id_pc=''
+      this.pcid=''
+      this.scid=''
+      this.deptId = null
       this.$refs['form'].resetFields()
       this.form = {
         id: '',
         idPc: { id: '' },
-        idSc: '',
+        idSc: { id: '' },
         idAn: '',
-        idDept: '',
+        idDept: { id: '' },
         idUser: '',
         status: ''
       }
-    }
+    },
+    
+    getPrimaryCategory() {
+      getAllPrimaryCategory().then(res => {
+        this.primaryCategorys = res
+      }).catch(err => {
+        console.log(err.response.data.message)
+      })
+    },
+    getSecondaryCategory() {
+      getAllSecondaryCategory().then(res => {
+        this.secondaryCategorys = res
+      }).catch(err => {
+        console.log(err.response.data.message)
+      })
+    },
+    
+    getDepts() {
+      getDepts({ enabled: true }).then(res => {
+        this.depts = res.content
+      })
+    },
+    selectFun(node, instanceId) {
+      // this.getJobs(node.id)
+    },
   }
 }
 </script>
