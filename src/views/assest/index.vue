@@ -36,10 +36,18 @@
       <el-table-column prop="id" label="序号"/>
       <el-table-column prop="idPc.name" label="一级类别"/>
       <el-table-column prop="idSc.name" label="二级类别"/>
-      <el-table-column prop="idAn" label="资产名称"/>
+      <el-table-column prop="name" label="资产名称"/>
       <el-table-column prop="idDept.name" label="所属部门"/>
       <el-table-column prop="idUser.username" label="责任者"/>
-      <el-table-column prop="status" label="状态"/>
+      <el-table-column prop="status" label="状态">
+            <template slot-scope="scope">
+              <el-switch
+                v-model="scope.row.status"
+                active-color="#409EFF"
+                inactive-color="#F56C6C"
+                @change="changeEnabled(scope.row, scope.row.status,)"/>
+            </template>
+      </el-table-column>
       <el-table-column v-if="checkPermission(['admin','myAssetList:edit','myAssetList:del'])" label="操作" width="150px" align="center">
         <template slot-scope="scope">
           <el-button v-permission="['admin','myAssetList:edit']" size="mini" type="primary" icon="el-icon-edit" @click="edit(scope.row)"/>
@@ -94,7 +102,7 @@ export default {
     checkPermission,
     beforeInit() {
       this.url = 'api/myAssetList'
-      const sort = 'id,desc'
+      const sort = 'id,asc'
       this.params = { page: this.page, size: this.size, sort: sort }
       const query = this.query
       const type = query.type
@@ -124,7 +132,7 @@ export default {
       const _this = this.$refs.form
 
       _this.getPrimaryCategory()
-      _this.getSecondaryCategory()
+      // _this.getSecondaryCategory()
       _this.getDepts()
 
       this.isAdd = true
@@ -136,10 +144,12 @@ export default {
       _this.pcid=data.idPc.id
       
       _this.scid=data.idSc.id
+      _this.anid = data.name
       _this.deptId = data.idDept.id
 
       _this.getPrimaryCategory()
-      _this.getSecondaryCategory()
+      _this.getSecondaryCategory(data.idPc.id)
+      _this.getAssestNames(data.idSc.id)
       _this.getDepts()
 
       // console.log(_this.primaryCategorys)
@@ -151,7 +161,9 @@ export default {
         idAn: data.idAn,
         idDept: data.idDept,
         idUser: data.idUser,
-        status: data.status
+        status: data.status,
+        
+        name: data.name,
       }
       _this.dialog = true
     },
@@ -165,11 +177,35 @@ export default {
       }).catch(() => {
         this.downloadLoading = false
       })
+    },
+    // 改变状态
+    changeEnabled(data, val) {
+      this.$confirm('此操作将 "' + this.dict.label.user_status[val] + '" ' + data.username + ', 是否继续？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        edit(data).then(res => {
+          this.$notify({
+            title: this.dict.label.user_status[val] + '成功',
+            type: 'success',
+            duration: 2500
+          })
+        }).catch(err => {
+          data.enabled = !data.enabled
+          console.log(err.response.data.message)
+        })
+      }).catch(() => {
+        data.enabled = !data.enabled
+      })
     }
   }
 }
 </script>
 
-<style scoped>
-
+<style  lang="scss">
+.myimportant{
+  background-color: aqua;
+  align-self: center;
+}
 </style>

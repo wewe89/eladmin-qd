@@ -54,7 +54,7 @@
           <el-table-column prop="username" label="用户名"/>
           <el-table-column prop="phone" label="电话"/>
           <el-table-column :show-overflow-tooltip="true" prop="email" label="邮箱"/>
-          <el-table-column label="部门 / 岗位">
+          <el-table-column label="支行 / 岗位">
             <template slot-scope="scope">
               <div>{{ scope.row.dept.name }} / {{ scope.row.job.name }}</div>
             </template>

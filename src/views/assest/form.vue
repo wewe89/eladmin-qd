@@ -3,7 +3,7 @@
     <el-form ref="form" :model="form" :rules="rules" size="small" label-width="80px">
       <el-form-item label="一级类别" >
         <!-- <el-input v-model="form.idPc.name" style="width: 370px;"/> -->
-        <el-select v-model="pcid" style="width: 370px" placeholder="请选择一级类别">
+        <el-select v-model="pcid" style="width: 370px" placeholder="请选择一级类别" @change="selectPrimaryCategorys(pcid)">
           <el-option
             v-for="(item, index) in primaryCategorys"
             :key="item.name + index"
@@ -12,7 +12,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="二级类别" >
-        <el-select v-model="scid" style="width: 370px" placeholder="请选择二级类别">
+        <el-select v-model="scid" style="width: 370px" placeholder="请选择二级类别" @change="selectSecondaryCategorys(pcid)">
           <el-option
             v-for="(item, index) in secondaryCategorys"
             :key="item.name + index"
@@ -21,17 +21,26 @@
         </el-select>
       </el-form-item>
       <el-form-item label="资产名称" >
-        <el-input v-model="form.idAn" style="width: 370px;"/>
+        <el-select v-model="anid" style="width: 370px" placeholder="请选择" @change="selectAssetName(anid)">
+          <el-option
+            v-for="(item, index) in assestNames"
+            :key="item.name + index"
+            :label="item.name"
+            :value="item.id" />
+        </el-select>
       </el-form-item>
       <el-form-item label="所属部门" >
-        <treeselect v-model="deptId" :options="depts" style="width: 370px" placeholder="选择部门" @select="selectFun" :isDefaultExpanded="true"/>
+        <treeselect v-model="deptId" :options="depts" style="width: 370px" placeholder="选择部门(支持搜索)" @select="selectDept" :isDefaultExpanded="true"/>
       </el-form-item>
       <el-form-item label="责任者" >
-        <el-input v-model="form.idUser" style="width: 370px;"/>
+        <el-input v-model="form.idUser.id" style="width: 370px;"/>
       </el-form-item>
-      <el-form-item label="状态" >
-        <el-input v-model="form.status" style="width: 370px;"/>
-      </el-form-item>
+      <el-form-item label="备注" >
+        <el-input v-model="form.note" style="width: 370px"/>
+       </el-form-item>
+     <!-- <el-form-item label="状态"  prop="form.status">
+        <el-radio v-for="item in dicts" :key="item.id" v-model="form.status" :label="item.value">{{ item.label }}</el-radio>
+      </el-form-item> -->
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button type="text" @click="cancel">取消</el-button>
@@ -45,6 +54,7 @@ import { add, edit } from '@/api/myAssetList'
 import { getDepts } from '@/api/dept'
 import { getAllPrimaryCategory } from '@/api/myPrimaryCategory'
 import { getAllSecondaryCategory } from '@/api/mySecondaryCategory'
+import { getAllAssetName } from '@/api/myAssetName'
 import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 export default {
@@ -58,8 +68,8 @@ export default {
   data() {
     return {
       loading: false, dialog: false,
-      pcid: '',scid: '',deptId: null,
-      primaryCategorys:[ ],secondaryCategorys:[ ], depts:[ ],
+      pcid: '',scid: '',deptId: null, anid:'',note:'',
+      primaryCategorys:[ ],secondaryCategorys:[ ], depts:[ ],assestNames:[],
       form: {
         id: '',
         idPc: { id: '' },
@@ -67,13 +77,33 @@ export default {
         idAn: '',
         idDept: { id: '' },
         idUser: { id: '',name: '' },
-        status: ''
+        note: '',
+        name: '',
+        status: true
       },
       rules: {
-      }
+      },
+      dicts: [{
+          value: true,
+          label: '启用'
+        }, {
+          value: false,
+          label: '禁用'
+        }, ],
     }
   },
   methods: {
+    selectPrimaryCategorys(data){
+      this.scid=''
+      this.getSecondaryCategory(data)
+    },
+    selectSecondaryCategorys(data){
+      this.anid=''
+      this.getAssestNames(this.scid)
+    },
+    selectAssetName(data){
+      console.log(this.anid)
+    },
     cancel() {
       this.resetForm()
     },
@@ -122,21 +152,33 @@ export default {
     },
     resetForm() {
       this.dialog = false
+
       this.pcid=''
       this.scid=''
       this.deptId = null
+      this.anid=''
       this.$refs['form'].resetFields()
+      
       this.form = {
         id: '',
         idPc: { id: '' },
         idSc: { id: '' },
         idAn: '',
         idDept: { id: '' },
-        idUser: '',
-        status: ''
+        idUser: { id: '',name: '' },
+        note: '',
+        name: '',
+        status: true
       }
     },
     
+    getAssestNames(data) {
+      getAllAssetName(data).then(res => {
+        this.assestNames = res
+      }).catch(err => {
+        console.log(err.response.data.message)
+      })
+    },
     getPrimaryCategory() {
       getAllPrimaryCategory().then(res => {
         this.primaryCategorys = res
@@ -144,8 +186,8 @@ export default {
         console.log(err.response.data.message)
       })
     },
-    getSecondaryCategory() {
-      getAllSecondaryCategory().then(res => {
+    getSecondaryCategory(data) {
+      getAllSecondaryCategory(data).then(res => {
         this.secondaryCategorys = res
       }).catch(err => {
         console.log(err.response.data.message)
@@ -157,7 +199,8 @@ export default {
         this.depts = res.content
       })
     },
-    selectFun(node, instanceId) {
+    selectDept(node, instanceId) {
+      console.log(node.name,node.id)
       // this.getJobs(node.id)
     },
   }

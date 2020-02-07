@@ -1,8 +1,9 @@
 import request from '@/utils/request'
 
-export function getAllSecondaryCategory() {
+export function getAllSecondaryCategory(data) {
+  
   return request({
-    url: 'api/mySecondaryCategory/all',
+    url: 'api/mySecondaryCategory/getAllByPid?pid='+data,
     method: 'get'
   })
 }
@@ -26,14 +27,5 @@ export function edit(data) {
     url: 'api/mySecondaryCategory',
     method: 'put',
     data
-  })
-}
-
-export function downloadMyAssetList(params) {
-  return request({
-    url: 'api/mySecondaryCategory/download',
-    method: 'get',
-    params,
-    responseType: 'blob'
   })
 }
