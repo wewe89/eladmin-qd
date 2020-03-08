@@ -35,8 +35,11 @@
       <el-form-item label="所属部门">
         <treeselect v-model="deptId" :options="depts" style="width: 370px" placeholder="选择部门(支持搜索)" :is-default-expanded="true" @select="selectDept" />
       </el-form-item>
-      <el-form-item label="责任者">
-        <el-input v-model="form.idUser.id" style="width: 370px;" />
+      <el-form-item label="柜员号">
+        <el-input v-model="form.idUser.username" style="width: 370px;" />
+      </el-form-item>
+      <el-form-item label="数量">
+        <el-input v-model="form.amount" style="width: 370px;" />
       </el-form-item>
       <el-form-item label="备注">
         <el-input v-model="form.note" style="width: 370px" />
@@ -72,6 +75,8 @@ export default {
     return {
       loading: false, dialog: false,
       pcid: '', scid: '', deptId: null, anid: '', note: '',
+      receivetime: '',
+      amount: '',
       primaryCategorys: [], secondaryCategorys: [], depts: [], assestNames: [],
       form: {
         id: '',
@@ -79,9 +84,11 @@ export default {
         idSc: { id: '' },
         idAn: '',
         idDept: { id: '' },
-        idUser: { id: '', name: '' },
+        idUser: { id: '', username: '' },
         note: '',
         name: '',
+        receivetime: '',
+        amount: '',
         status: true
       },
       rules: {
@@ -105,7 +112,8 @@ export default {
       this.getAssestNames(this.scid)
     },
     selectAssetName(data) {
-      console.log(this.anid)
+      this.form.idAn = this.anid
+      console.log(this.anid, data)
     },
     cancel() {
       this.resetForm()
@@ -159,6 +167,8 @@ export default {
       this.scid = ''
       this.deptId = null
       this.anid = ''
+      this.receivetime = '',
+      this.amount = '',
       this.$refs['form'].resetFields()
 
       this.form = {
@@ -167,9 +177,11 @@ export default {
         idSc: { id: '' },
         idAn: '',
         idDept: { id: '' },
-        idUser: { id: '', name: '' },
+        idUser: { id: '', username: '' },
         note: '',
         name: '',
+        receivetime: '',
+        amount: '',
         status: true
       }
     },

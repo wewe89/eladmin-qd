@@ -40,7 +40,14 @@
       <el-table-column prop="idSc.name" label="二级类别" />
       <el-table-column prop="name" label="资产名称" />
       <el-table-column prop="idDept.name" label="所属部门" />
-      <el-table-column prop="idUser.username" label="责任者" />
+      <el-table-column prop="idUser.username" label="柜员号" />
+      <el-table-column prop="idUser.nick_name" label="姓名" />
+      <el-table-column prop="receivetime" label="领用日期">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.receivetime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="amount" label="数量" />
       <el-table-column prop="status" label="状态">
         <template slot-scope="scope">
           <el-switch
