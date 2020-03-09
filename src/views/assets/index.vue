@@ -34,21 +34,21 @@
     <!--表单组件-->
     <eForm ref="form" :is-add="isAdd" />
     <!--表格渲染-->
-    <el-table v-loading="loading" :data="data" size="small" style="width: 100%;">
-      <el-table-column prop="id" label="序号" />
-      <el-table-column prop="idPc.name" label="一级类别" />
-      <el-table-column prop="idSc.name" label="二级类别" />
-      <el-table-column prop="name" label="资产名称" />
-      <el-table-column prop="idDept.name" label="所属部门" />
-      <el-table-column prop="idUser.username" label="柜员号" />
-      <el-table-column prop="idUser.nick_name" label="姓名" />
-      <el-table-column prop="receivetime" label="领用日期">
+    <el-table v-loading="loading" :data="data" size="small" style="width: 100%;" :row-class-name="tableRowClassName" border>
+      <el-table-column prop="id" label="序号" width="80" align="center"/>
+      <el-table-column prop="idPc.name" label="一级类别" width="150" align="center"/>
+      <el-table-column prop="idSc.name" label="二级类别" width="150" align="center"/>
+      <el-table-column prop="name" label="资产名称" width="150" align="center"/>
+      <el-table-column prop="idDept.name" label="所属部门"  align="center"/>
+      <el-table-column prop="idUser.username" label="柜员号"  align="center"/>
+      <el-table-column prop="idUser.nickName" label="姓名"  align="center"/>
+      <el-table-column prop="receivetime" label="领用日期" align="center">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.receivetime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="amount" label="数量" />
-      <el-table-column prop="status" label="状态">
+      <el-table-column prop="amount" label="数量"  width="50" align="center"/>
+      <el-table-column prop="status" label="状态" width="70" align="center">
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.status"
@@ -88,7 +88,15 @@
     />
   </div>
 </template>
+<style>
+  .el-table .warning-row {
+    background: oldlace;
+  }
 
+  .el-table .success-row {
+    background: #f0f9eb;
+  }
+</style>
 <script>
 import checkPermission from '@/utils/permission'
 import initData from '@/mixins/crud'
@@ -111,6 +119,14 @@ export default {
     })
   },
   methods: {
+    tableRowClassName({row, rowIndex}) {
+        if (rowIndex === 1) {
+          return 'warning-row';
+        } else if (rowIndex === 3) {
+          return 'success-row';
+        }
+        return '';
+      },
     checkPermission,
     beforeInit() {
       this.url = 'api/myAssetList'
