@@ -41,7 +41,7 @@
       <el-table-column prop="name" label="资产名称" />
       <el-table-column prop="idDept.name" label="所属部门" />
       <el-table-column prop="idUser.username" label="柜员号" />
-      <el-table-column prop="idUser.nickName" label="姓名" />
+      <el-table-column prop="idUser.nick_name" label="姓名" />
       <el-table-column prop="receivetime" label="领用日期">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.receivetime) }}</span>
